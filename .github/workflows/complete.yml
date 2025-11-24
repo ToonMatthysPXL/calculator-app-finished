@@ -31,7 +31,15 @@ jobs:
           # Run tests with junit output
           npx jest --ci --reporters=default --reporters=jest-junit
 
-      - name: Test Report
+      # 5. Upload test report as artifact
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: junit.xml
+
+      # 6 Better test report
+      - name: Better test report
         uses: dorny/test-reporter@v2
         if: ${{ !cancelled() }}       # run this step even if previous step failed
         with:
