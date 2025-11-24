@@ -1,4 +1,4 @@
-name: Build Example
+name: Final Build Example
 
 on:
   workflow_dispatch:
@@ -31,12 +31,13 @@ jobs:
           # Run tests with junit output
           npx jest --ci --reporters=default --reporters=jest-junit
 
-      # 5. Upload test report as artifact
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
+      - name: Test Report
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}       # run this step even if previous step failed
         with:
-          name: test-report
-          path: junit.xml
+          name: JEST Tests            # Name of the check run which will be created
+          path: reports/jest-*.xml    # Path to test results
+          reporter: jest-junit        # Format of test results
 
       # 6. Bundle application into ZIP (app files + node_modules)
       - name: Bundle application into ZIP
