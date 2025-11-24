@@ -22,30 +22,30 @@ jobs:
       - name: Install NPM dependencies
         run: npm install
 
-      # 4. Run unit tests + generate report
+      # Run unit tests + generate report
       - name: Run unit tests
+        env:
+          JEST_JUNIT_OUTPUT: reports/jest-results.xml
         run: |
-          # Install junit reporter if not included in package.json
+          mkdir -p reports
           npm install --save-dev jest-junit
-          
-          # Run tests with junit output
           npx jest --ci --reporters=default --reporters=jest-junit
-
-      # 5. Upload test report as artifact
+      
+      # Upload test report
       - name: Upload test report
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: jest-reports.xml
-
-      # 6 Better test report
+          path: reports/jest-results.xml
+      
+      # Better test report
       - name: Better test report
         uses: dorny/test-reporter@v2
-        if: ${{ !cancelled() }}       # run this step even if previous step failed
+        if: ${{ !cancelled() }}
         with:
-          name: JEST Tests            # Name of the check run which will be created
-          path: jest-*.xml    # Path to test results
-          reporter: jest-junit        # Format of test results
+          name: JEST Tests
+          path: reports/jest-results.xml
+          reporter: jest-junit
 
       # 6. Bundle application into ZIP (app files + node_modules)
       - name: Bundle application into ZIP
